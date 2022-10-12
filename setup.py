@@ -12,5 +12,6 @@ setup(name=PACKAGE_NAME,
                    "success stats of my C++ project"),
       long_description=open("README.md", "r", encoding="utf-8").read(),
       install_requires=REQUIREMENTS,
+      include_package_data=True,
       packages=find_packages(where=".", include=["perf_tracker"]),
       entry_points={'console_scripts': ['perf = perf_tracker.main:main']})

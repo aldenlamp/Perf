@@ -12,7 +12,18 @@ class InputController():
 
         InputController._add_arguments(parser)
 
-        print(parser.parse_args())
+        args = parser.parse_args()
+        if args.gen_config:
+            InputController._generate_config(args.name)
+
+    @staticmethod
+    def _generate_config(name: str):
+        file_text = ""
+        with open("example_config.txt", "r") as template_config:
+            file_text = template_config.read()
+
+        with open(f"perf_{name}_config.txt", "w+") as out_config:
+            out_config.write(file_text)
 
     @staticmethod
     def _add_arguments(parser: argparse.ArgumentParser):
@@ -53,7 +64,7 @@ class InputController():
                             "--config_file",
                             dest="file",
                             type=str,
-                            required=True,
+                            required=False,
                             help="The config file to use")
 
         parser.add_argument("-p",
@@ -61,4 +72,5 @@ class InputController():
                             dest="prog",
                             nargs="*",
                             type=str,
-                            required=True)
+                            required=False,
+                            help="A single program to perf test")
