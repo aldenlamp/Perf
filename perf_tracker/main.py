@@ -3,5 +3,5 @@ from perf_tracker.input_controller import InputController
 
 
 def main() -> int:
-    InputController.parse_args()
+    InputController.handle_inputs()
     return 0

@@ -37,3 +37,4 @@ venv.bak/
 
 # Dev specific
 results
+perf_output
