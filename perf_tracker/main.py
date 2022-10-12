@@ -1,3 +1,7 @@
+from multiprocessing.spawn import import_main_path
+from perf_tracker.input_controller import InputController
+
+
 def main() -> int:
-    print("This is a test")
+    InputController.parse_args()
     return 0
