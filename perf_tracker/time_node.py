@@ -1,10 +1,11 @@
 import math
+import sys
 
 
 class TimeNode():
     """A class for keeping track of program run times"""
 
-    def __init__(self, name="Main", full_path=None):
+    def __init__(self, name="All", full_path=None):
         """Init the time node object"""
         self.name = name
         self.full_path = full_path
@@ -19,6 +20,8 @@ class TimeNode():
 
     def add_tree_time(self, path: list[str], time: float, layer=0):
         """Adds a time to the time tree structure (creates missing nodes)"""
+        if path[layer] != self.name:
+            sys.exit("Error in generating time tree")
 
         if layer == len(path) - 1:
             self.add_time(time)
