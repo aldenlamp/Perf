@@ -39,6 +39,7 @@ class Prog():
     def run_test(self, arg: str, index: int):
         """Runs a single test on an argument and an iteration"""
         prog = self.prog.replace("$", arg)
+        print(f"RUNNING: {prog}")
         start_time = time.perf_counter()
         process = subprocess.run(prog, shell=True, capture_output=True)
         end_time = time.perf_counter()
