@@ -3,6 +3,7 @@ import os
 import sys
 
 from pathlib import Path
+from perf_tracker.prog import Prog
 
 
 class InputController():
@@ -11,7 +12,7 @@ class InputController():
     @staticmethod
     def handle_inputs():
         """Handles inputs"""
-        InputController._parse_args()
+        return InputController._parse_args()
 
     @staticmethod
     def _parse_args():
@@ -26,13 +27,16 @@ class InputController():
         if args.gen_config:
             InputController._generate_config(args.name)
 
-        if not args.file and not args.prog:
-            sys.exit("No program or config file specified")
-
         out_dir = Path(args.output_dir)
+        out_dir_arg = out_dir / args.name
+
         out_dir.mkdir(exist_ok=True)
-        out_dir = out_dir / args.name
-        InputController._generate_output_folder(out_dir)
+        InputController._generate_output_folder(out_dir_arg)
+
+        prog_list = InputController._input_prog(args.prog, args.file,
+                                                out_dir_arg)
+
+        return prog_list
 
     @staticmethod
     def _generate_output_folder(out_dir: Path):
@@ -71,6 +75,91 @@ class InputController():
         with open(f"perf_{name}_config.txt", "w+") as out_config:
             out_config.write(file_text)
         sys.exit(0)
+
+    @staticmethod
+    def _input_prog(prog: str, config_file: str, out_dir: Path) -> list[Prog]:
+        """Gets a list of progs to test"""
+        if prog is None and config_file is None:
+            sys.exit("Missing a config file or a program to run")
+        if config_file:
+            if prog:
+                print(("program and config file both specified, "
+                       "only config file will be used"))
+            return InputController._input_file(Path(config_file), out_dir)
+        p_name = prog.split()[0]
+        if p_name[:2] == "./":
+            p_name = p_name[2:]
+
+        return [Prog(p_name, prog, out_dir)]
+
+    @staticmethod
+    def _parse_arg_line(line: str) -> tuple[int, str]:
+        """Parses a line with arguments and x values"""
+        split_line = line.split()
+        if len(split_line) != 2:
+            sys.exit((f"Could not process line '{line}'."
+                      "Strictly two args are necessary."))
+        if not split_line[0].isdigit():
+            sys.exit(f"Could not process '{split_line[0]}' as int")
+        return int(split_line[0]), split_line[1]
+
+    @staticmethod
+    def _input_file(file_name: Path, out_dir: Path) -> list[Prog]:
+        """Inputs a list of progs from a config file"""
+        progs = []
+        if not file_name.exists():
+            sys.exit(f"File not found: {file_name}")
+
+        num_prog = None
+        num_var = None
+        line_count = -1
+        prog_args = {}
+
+        with open(file_name, "r", encoding="utf-8") as file:
+            for line in file:
+                if line[0] == "#" or line == "\n":
+                    continue
+                line = line.rstrip()
+
+                if num_prog is None and num_var is None and not line.isdigit():
+                    sys.exit((f"Could not parse '{line}' as an int"))
+                if num_prog is None:
+                    num_prog = int(line)
+                    continue
+                if num_var is None:
+                    num_var = int(line)
+                    continue
+
+                line_count += 1
+
+                print(
+                    f"lc: {line_count}\tnumvar:{num_var}\tprogargs:{prog_args}"
+                )
+
+                # Handles prog name
+                if line_count % (num_var + 2) == 0:
+                    prog_args["name"] = line
+                    continue
+
+                # Handles Program line (along with making the program)
+                if line_count % (num_var + 2) == num_var + 1:
+                    prog_args["prog"] = line
+                    prog_args["out_dir"] = out_dir
+                    progs.append(Prog(**prog_args))
+                    prog_args = {}
+                    continue
+
+                # Handles prog argument line
+                curr_x, curr_arg = InputController._parse_arg_line(line)
+
+                if "args" not in prog_args:
+                    prog_args["args"] = []
+                    prog_args["x"] = []
+
+                prog_args["args"].append(curr_arg)
+                prog_args["x"].append(curr_x)
+
+        return progs
 
     @staticmethod
     def _add_arguments(parser: argparse.ArgumentParser):
@@ -118,7 +207,6 @@ class InputController():
         parser.add_argument("-p",
                             "--program",
                             dest="prog",
-                            nargs="*",
                             type=str,
                             required=False,
                             help="A single program to perf test")
