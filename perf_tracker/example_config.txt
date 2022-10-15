@@ -1,0 +1,25 @@
+#<n = number of programs>
+#<m = number of variables per program>
+#
+# n groups of programs :
+#<program name>
+# m lines of
+#<x_axis representation> <variable>
+#<program with $ for variable representations>
+
+# Full example below
+
+2
+3
+
+sparse1
+1000 1k
+10000 10k
+100000 100k
+./sparse data/compare/$ data/compare/sims/$_annot.txt data/compare/sims/$.pheno
+
+sparse2
+1000 10k
+10000 100k
+100000 1m
+./sparse data/compare/$ data/compare/sims/$_annot.txt data/compare/sims/$.pheno
