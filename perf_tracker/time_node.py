@@ -12,6 +12,24 @@ class TimeNode():
         self.times = []
         self.children = []
 
+    def print_output(self, level=0):
+        """Prints this time node"""
+        ind = '  ' * level
+        if len(self.times) > 0:
+            format_str = "{} {:<25} {:<5} {:<10} {:<5} {:<10}"
+            out = format_str.format(ind, self.name, "avg: ",
+                                    self.get_avg_time(), "sd: ",
+                                    self.get_sd_time())
+            print(out)
+        else:
+            print("{} {:<25}".format(ind, self.name))
+
+    def print_all_outputs(self, level=0):
+        """Prints all the entire timenode tree"""
+        self.print_output(level)
+        for i in self.children:
+            i.print_all_outputs(level + 1)
+
     def add_child(self, node):
         """Add a child time node"""
         if not self.children:
