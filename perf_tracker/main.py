@@ -25,6 +25,7 @@ def main() -> int:
         print(prog.name)
         print(prog.args)
         print(prog.x)
+        print(prog.commands)
         print("")
     for prog in progs:
         prog.run_all_tests(2)
