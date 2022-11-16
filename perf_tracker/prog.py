@@ -57,6 +57,7 @@ class Prog():
 
         with open(self.out_dir / "average_runtimes.txt", "w+") as out_file:
             out_file.write(self.time_node.get_all_out_str())
+        self.time_node.generate_all_pie_plots(self.out_dir / "pie_charts")
 
     def run_commands(self):
         """Runs the proceeding saved commands"""

@@ -30,5 +30,3 @@ class PerfController():
     def run_tests(self):
         for prog in self.progs:
             prog.run_all_tests(self.iterations)
-            # prog.print()
-            # prog.time_node.generate_all_pie_plots(out_dir / "pie_charts")
