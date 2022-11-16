@@ -18,8 +18,12 @@ class Visualizer():
         ax.set_position(
             [box.x0 - (.25 * box.width), box.y0, box.width, box.height])
 
+        legend_labels = [
+            f"{l} ({int(values[i])})" for i, l in enumerate(labels)
+        ]
+
         ax.legend(wedges,
-                  labels,
+                  legend_labels,
                   loc="center left",
                   bbox_to_anchor=(0.9, 0, 0.5, 1))
 
