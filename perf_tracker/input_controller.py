@@ -132,13 +132,18 @@ class InputController():
 
                 line_count += 1
 
-                print(
-                    f"lc: {line_count}\tnumvar:{num_var}\tprogargs:{prog_args}"
-                )
-
                 # Handles prog name
                 if line_count % (num_var + 2) == 0:
                     prog_args["name"] = line
+                    continue
+
+                # Handles commands
+                if "commands" not in prog_args:
+                    prog_args["commands"] = []
+
+                if line[0] == ">" or line[0] == "$" or line[0] == "%":
+                    prog_args["commands"].append(line[1:])
+                    line_count -= 1
                     continue
 
                 # Handles Program line (along with making the program)

@@ -1,25 +1,35 @@
-#<n = number of programs>
-#<m = number of variables per program>
-#
-# n groups of programs :
-#<program name>
-# m lines of
-#<x_axis representation> <variable>
-#<program with $ for variable representations>
-
-# Full example below
-
+# Number of programs
 2
+
+# Number of arguments per program
 3
 
+# EXAMPLE:
+# Program name
 sparse1
+
+# Any commands to run before running the program
+> echo setting up command line for sparse1 program
+
+# Args in the form of "x arg"
+#   x represents a standardized 'size' to graph against
+#   arg represents a string argument to use in the program
 1000 1k
 10000 10k
 100000 100k
+
+# Program command. Every $ will get replaced by the argument for that iteration
 ./sparse data/compare/$ data/compare/sims/$_annot.txt data/compare/sims/$.pheno
 
+
+# Program 2
+
 sparse2
+
+> echo setting up for program 2
+
 1000 10k
 10000 100k
 100000 1m
+
 ./sparse data/compare/$ data/compare/sims/$_annot.txt data/compare/sims/$.pheno

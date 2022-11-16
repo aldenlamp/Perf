@@ -1,3 +1,4 @@
+from concurrent.futures import process
 import subprocess
 import time
 
@@ -12,6 +13,7 @@ class Prog():
                  name: str,
                  prog: str,
                  out_dir: Path,
+                 commands: list[str] = [],
                  args: list[str] = ["$"],
                  x: list[int] = [1]):
         """Inits the Program"""
@@ -20,6 +22,7 @@ class Prog():
         self.out_dir = out_dir / name
         self.out_dir.mkdir()
 
+        self.commands = commands
         self.args = args
         self.x = x
 
@@ -31,10 +34,32 @@ class Prog():
 
     def run_all_tests(self, iterations: int):
         """Runs all the iterations for all the arguments"""
+        self.run_commands()
         for arg in self.args:
             (self.out_dir / f"arg_{arg}").mkdir()
             for i in range(iterations):
                 self.run_test(arg, i)
+
+    def run_commands(self):
+        """Runs the proceeding saved commands"""
+        if not self.commands:
+            return
+
+        with open(self.out_dir / "command_outputs.txt", "w+") as output_file:
+            command_count = 0
+            for command in self.commands:
+                print(f"PRECOMMAND RUNNING: {command}")
+                process = subprocess.run(command,
+                                         shell=True,
+                                         capture_output=True)
+                std_out = process.stdout.decode("utf-8")
+                err_out = process.stderr.decode("utf-8")
+
+                output_file.write((f"COMMAND ({command_count}): {command}\n"
+                                   f"RETURN CODE: {process.returncode}\n"
+                                   f"STD OUT: {std_out.rstrip()}\n"
+                                   f"STD ERR: {err_out.rstrip()}\n\n"))
+                command_count += 1
 
     def run_test(self, arg: str, index: int):
         """Runs a single test on an argument and an iteration"""
