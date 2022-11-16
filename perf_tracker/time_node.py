@@ -47,7 +47,7 @@ class TimeNode():
             partitioned_times.append(total_time - partitioned_sum)
             labels.append("Other")
 
-        out_dir.mkdir(exist_ok=True)
+        out_dir.mkdir(parents=True, exist_ok=True)
         Visualizer.create_pie_chart(partitioned_times, labels, out_dir,
                                     f"{level}-{self.name}")
 

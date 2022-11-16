@@ -30,3 +30,4 @@ class Visualizer():
                   bbox_to_anchor=(0.9, 0, 0.5, 1))
 
         plt.savefig(out_dir / f"{plot_name}.png")
+        plt.close()

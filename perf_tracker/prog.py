@@ -51,13 +51,16 @@ class Prog():
         """Runs all the iterations for all the arguments"""
         self.run_commands()
         for arg in self.args:
-            (self.out_dir / f"arg_{arg}").mkdir()
+            (self.out_dir / "iterations" / f"arg_{arg}").mkdir(parents=True)
             for i in range(iterations):
                 self.run_test(arg, i)
 
         with open(self.out_dir / "average_runtimes.txt", "w+") as out_file:
             out_file.write(self.time_node.get_all_out_str())
-        self.time_node.generate_all_pie_plots(self.out_dir / "pie_charts")
+
+        for children_nodes in self.time_node.children:
+            out_path = self.out_dir / "pie_charts" / children_nodes.name
+            children_nodes.generate_all_pie_plots(out_path)
 
     def run_commands(self):
         """Runs the proceeding saved commands"""
@@ -90,7 +93,7 @@ class Prog():
 
         elapsed_time = 1000 * (end_time - start_time)
 
-        save_file = self.out_dir / f"arg_{arg}" / f"iteration{index}.txt"
+        save_file = self.out_dir / "iterations" / f"arg_{arg}" / f"iteration{index}.txt"
 
         with open(save_file, "w+") as out_file:
 

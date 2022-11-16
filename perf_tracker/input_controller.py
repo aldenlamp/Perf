@@ -3,6 +3,7 @@ import os
 import sys
 
 from pathlib import Path
+
 from perf_tracker.prog import Prog
 from perf_tracker.perf_controller import PerfController
 
