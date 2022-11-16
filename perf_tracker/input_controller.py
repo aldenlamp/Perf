@@ -10,13 +10,8 @@ class InputController():
     """Handles performance tester input from both args and config files."""
 
     @staticmethod
-    def handle_inputs():
-        """Handles inputs"""
-        return InputController._parse_args()
-
-    @staticmethod
-    def _parse_args():
-        """Parses and validates command line arguments"""
+    def handle_inputs() -> tuple[list[Prog], Path]:
+        """Handles inputs and returns a list of programs and output dir"""
         parser = argparse.ArgumentParser(
             description="Config",
             formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -41,7 +36,7 @@ class InputController():
 
         InputController._copy_config(out_dir_arg, prog_list)
 
-        return prog_list
+        return (prog_list, out_dir_arg)
 
     @staticmethod
     def _copy_config(out_dir: Path, prog_list: list[Prog]):

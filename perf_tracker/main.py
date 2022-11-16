@@ -1,5 +1,6 @@
 from multiprocessing.spawn import import_main_path
 from perf_tracker.input_controller import InputController
+from perf_tracker.visualizer import Visualizer
 from perf_tracker.time_node import TimeNode
 from perf_tracker.prog import Prog
 
@@ -20,7 +21,11 @@ def main() -> int:
     # prog.run_all_tests(2)
     # prog.print()
 
-    progs = InputController.handle_inputs()
+    progs, out_dir = InputController.handle_inputs()
+    # Visualizer.create_pie_chart([10, 40, 50],
+    #                             ["small", "middle", "bigger than middle"],
+    #                             Path("perf_output/dev_test"))
+
     for prog in progs:
         print(prog.name)
         print(prog.args)
@@ -28,7 +33,8 @@ def main() -> int:
         print(prog.commands)
         print("")
     for prog in progs:
-        prog.run_all_tests(2)
+        prog.run_all_tests(1)
         prog.print()
+        prog.time_node.generate_all_pie_plots(out_dir / "pie_charts")
 
     return 0

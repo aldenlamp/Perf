@@ -1,5 +1,8 @@
 import math
+from pathlib import Path
 import sys
+
+from perf_tracker.visualizer import Visualizer
 
 
 class TimeNode():
@@ -29,6 +32,28 @@ class TimeNode():
         self.print_output(level)
         for i in self.children:
             i.print_all_outputs(level + 1)
+
+    def generate_pie_plots(self, out_dir: Path, level: int = 0):
+        """Creates a pie chart for this time node"""
+        partitioned_times = [child.get_avg_time() for child in self.children]
+        labels = [child.name for child in self.children]
+
+        total_time = self.get_avg_time()
+
+        partitioned_sum = sum(partitioned_times)
+        if partitioned_sum < total_time:
+            partitioned_times.append(total_time - partitioned_sum)
+            labels.append("Other")
+
+        out_dir.mkdir(exist_ok=True)
+        Visualizer.create_pie_chart(partitioned_times, labels, out_dir,
+                                    f"{level}-{self.name}")
+
+    def generate_all_pie_plots(self, out_dir: Path, level: int = 0):
+        """Recursively generates pie plots for all times nodes in the tree"""
+        self.generate_pie_plots(out_dir, level)
+        for child in self.children:
+            child.generate_all_pie_plots(out_dir, level + 1)
 
     def add_child(self, node):
         """Add a child time node"""
@@ -68,6 +93,8 @@ class TimeNode():
 
     def get_avg_time(self) -> float:
         """Gets the average time of this node"""
+        if not self.times:
+            return 0
         return sum(self.times) / len(self.times)
 
     def get_sd_time(self) -> float:
