@@ -36,7 +36,23 @@ class InputController():
         prog_list = InputController._input_prog(args.prog, args.file,
                                                 out_dir_arg)
 
+        if not prog_list:
+            sys.exit("No programs parsed")
+
+        InputController._copy_config(out_dir_arg, prog_list)
+
         return prog_list
+
+    @staticmethod
+    def _copy_config(out_dir: Path, prog_list: list[Prog]):
+        """Copies the program list into a new program config"""
+
+        with open(out_dir / "config.txt", "w+") as config_file:
+            num_prog = len(prog_list)
+            num_vars = len(prog_list[0].args)
+            config_file.write(f"{num_prog}\n{num_vars}\n\n")
+            for prog in prog_list:
+                config_file.write(f"{prog.get_config_str()}\n\n\n")
 
     @staticmethod
     def _generate_output_folder(out_dir: Path):

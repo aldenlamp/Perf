@@ -1,4 +1,5 @@
 from concurrent.futures import process
+from distutils.command.config import config
 import subprocess
 import time
 
@@ -31,6 +32,20 @@ class Prog():
     def print(self):
         """Prints the entire time node tree for this program"""
         self.time_node.print_all_outputs()
+
+    def get_config_str(self) -> str:
+        """Returns a str of program as it would be in a config file"""
+        name_str = f"{self.name}"
+
+        commands_str = '\n>'.join(self.commands)
+        if commands_str:
+            commands_str = ">" + commands_str
+
+        arg_lines = "\n".join([f"{i} {j}" for i, j in zip(self.x, self.args)])
+
+        config_str = f"{name_str}\n{commands_str}\n{arg_lines}\n{self.prog}"
+
+        return config_str
 
     def run_all_tests(self, iterations: int):
         """Runs all the iterations for all the arguments"""
