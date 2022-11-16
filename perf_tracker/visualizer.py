@@ -20,7 +20,8 @@ class Visualizer():
             [box.x0 - (.25 * box.width), box.y0, box.width, box.height])
 
         legend_labels = [
-            f"{l} ({int(values[i] * 100) / 100})" for i, l in enumerate(labels)
+            f"{l} ({int(values[i] * 100) / 100})"
+            for i, l in enumerate(labels)  # type: ignore
         ]
 
         ax.legend(wedges,
@@ -29,3 +30,4 @@ class Visualizer():
                   bbox_to_anchor=(0.9, 0, 0.5, 1))
 
         plt.savefig(out_dir / f"{plot_name}.png")
+        plt.close()

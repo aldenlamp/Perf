@@ -3,15 +3,19 @@ import os
 import sys
 
 from pathlib import Path
+
 from perf_tracker.prog import Prog
+from perf_tracker.perf_controller import PerfController
 
 
 class InputController():
     """Handles performance tester input from both args and config files."""
 
     @staticmethod
-    def handle_inputs() -> tuple[list[Prog], Path]:
+    def handle_inputs() -> PerfController:
         """Handles inputs and returns a list of programs and output dir"""
+
+        # Create and set up parser
         parser = argparse.ArgumentParser(
             description="Config",
             formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -22,32 +26,37 @@ class InputController():
         if args.gen_config:
             InputController._generate_config(args.name)
 
+        # Set up outpuf folder
         out_dir = Path(args.output_dir)
         out_dir_arg = out_dir / args.name
 
         out_dir.mkdir(exist_ok=True)
         InputController._generate_output_folder(out_dir_arg)
 
+        # Get programs
         prog_list = InputController._input_prog(args.prog, args.file,
                                                 out_dir_arg)
 
+        # Verify inputs
         if not prog_list:
             sys.exit("No programs parsed")
 
-        InputController._copy_config(out_dir_arg, prog_list)
+        if args.count < 1:
+            sys.exit("Iterations must be greater than 0")
 
-        return (prog_list, out_dir_arg)
+        names = [i.name for i in prog_list]
+        if len(names) != len(set(names)):
+            sys.exit("All programs must have a unique name")
 
-    @staticmethod
-    def _copy_config(out_dir: Path, prog_list: list[Prog]):
-        """Copies the program list into a new program config"""
+        # Create perf controller
+        controller_args = {
+            "iterations": args.count,
+            "val": args.valgrind,
+            "out_dir": out_dir_arg,
+            "progs": prog_list
+        }
 
-        with open(out_dir / "config.txt", "w+") as config_file:
-            num_prog = len(prog_list)
-            num_vars = len(prog_list[0].args)
-            config_file.write(f"{num_prog}\n{num_vars}\n\n")
-            for prog in prog_list:
-                config_file.write(f"{prog.get_config_str()}\n\n\n")
+        return PerfController(**controller_args)
 
     @staticmethod
     def _generate_output_folder(out_dir: Path):

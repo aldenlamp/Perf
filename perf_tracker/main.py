@@ -21,20 +21,23 @@ def main() -> int:
     # prog.run_all_tests(2)
     # prog.print()
 
-    progs, out_dir = InputController.handle_inputs()
+    # progs, out_dir = InputController.handle_inputs()
     # Visualizer.create_pie_chart([10, 40, 50],
     #                             ["small", "middle", "bigger than middle"],
     #                             Path("perf_output/dev_test"))
 
-    for prog in progs:
-        print(prog.name)
-        print(prog.args)
-        print(prog.x)
-        print(prog.commands)
-        print("")
-    for prog in progs:
-        prog.run_all_tests(1)
-        prog.print()
-        prog.time_node.generate_all_pie_plots(out_dir / "pie_charts")
+    controller = InputController.handle_inputs()
+    controller.run_tests()
+
+    # for prog in progs:
+    #     print(prog.name)
+    #     print(prog.args)
+    #     print(prog.x)
+    #     print(prog.commands)
+    #     print("")
+    # for prog in progs:
+    #     prog.run_all_tests(1)
+    #     prog.print()
+    #     prog.time_node.generate_all_pie_plots(out_dir / "pie_charts")
 
     return 0
