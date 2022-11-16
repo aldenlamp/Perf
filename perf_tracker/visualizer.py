@@ -10,16 +10,17 @@ class Visualizer():
                          labels: list[str],
                          out_dir: Path,
                          plot_name: str = "pie_plot"):
+        """Creates and saves a pie plot"""
 
         _, ax = plt.subplots(subplot_kw=dict(aspect="equal"))
-        wedges, _ = ax.pie(values, startangle=0, labels=None)  # type: ignore
+        wedges, _ = ax.pie(values, startangle=90, labels=None)  # type: ignore
         box = ax.get_position()
 
         ax.set_position(
             [box.x0 - (.25 * box.width), box.y0, box.width, box.height])
 
         legend_labels = [
-            f"{l} ({int(values[i])})" for i, l in enumerate(labels)
+            f"{l} ({int(values[i] * 100) / 100})" for i, l in enumerate(labels)
         ]
 
         ax.legend(wedges,
