@@ -31,7 +31,7 @@ class Prog():
 
     def print(self):
         """Prints the entire time node tree for this program"""
-        self.time_node.print_all_outputs()
+        print(self.time_node.get_all_out_str())
 
     def get_config_str(self) -> str:
         """Returns a str of program as it would be in a config file"""
@@ -54,6 +54,9 @@ class Prog():
             (self.out_dir / f"arg_{arg}").mkdir()
             for i in range(iterations):
                 self.run_test(arg, i)
+
+        with open(self.out_dir / "average_runtimes.txt", "w+") as out_file:
+            out_file.write(self.time_node.get_all_out_str())
 
     def run_commands(self):
         """Runs the proceeding saved commands"""
@@ -79,7 +82,7 @@ class Prog():
     def run_test(self, arg: str, index: int):
         """Runs a single test on an argument and an iteration"""
         prog = self.prog.replace("$", arg)
-        print(f"RUNNING: {prog}")
+        print(f"RUNNING ({index}): {prog}")
         start_time = time.perf_counter()
         process = subprocess.run(prog, shell=True, capture_output=True)
         end_time = time.perf_counter()
@@ -104,7 +107,7 @@ class Prog():
             out_file.write("\n\n======TIMER======\n")
             out_file.write(f"time: {elapsed_time}")
 
-        self.time_node.add_tree_time(["All", arg], elapsed_time)
+        self.time_node.add_tree_time(["All", f"arg_{arg}"], elapsed_time)
         self._process_output(arg, process.stdout.decode("utf-8"))
 
     def _process_output(self, arg: str, stdout: str):
@@ -115,7 +118,7 @@ class Prog():
 
                 val = float(split_line[-1])
 
-                partition_names = ["All", arg] + split_line[:-1]
+                partition_names = ["All", f"arg_{arg}"] + split_line[:-1]
                 self.time_node.add_tree_time(partition_names, val)
 
     def run_valgrind(self):

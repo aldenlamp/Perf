@@ -1,3 +1,4 @@
+from ast import Str
 import math
 from pathlib import Path
 import sys
@@ -15,23 +16,24 @@ class TimeNode():
         self.times = []
         self.children = []
 
-    def print_output(self, level=0):
-        """Prints this time node"""
+    def get_out_str(self, level=0) -> str:
+        """Returns a string representing this time node as a string"""
         ind = '  ' * level
         if len(self.times) > 0:
             format_str = "{} {:<25} {:<5} {:<10} {:<5} {:<10}"
             out = format_str.format(ind, self.name, "avg: ",
-                                    self.get_avg_time(), "sd: ",
-                                    self.get_sd_time())
-            print(out)
+                                    str(self.get_avg_time())[:8], "sd: ",
+                                    str(self.get_sd_time())[:8])
+            return out
         else:
-            print("{} {:<25}".format(ind, self.name))
+            return "{} {:<25}".format(ind, self.name)
 
-    def print_all_outputs(self, level=0):
-        """Prints all the entire timenode tree"""
-        self.print_output(level)
-        for i in self.children:
-            i.print_all_outputs(level + 1)
+    def get_all_out_str(self, level=0) -> str:
+        """Gets a string representing the entire time node tree"""
+        curr_str = f"{self.get_out_str(level)}\n"
+        child_strs = [i.get_all_out_str(level + 1) for i in self.children]
+
+        return curr_str + "".join(child_strs)
 
     def generate_pie_plots(self, out_dir: Path, level: int = 0):
         """Creates a pie chart for this time node"""
