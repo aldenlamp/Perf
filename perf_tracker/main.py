@@ -1,3 +1,4 @@
+from cProfile import label
 from multiprocessing.spawn import import_main_path
 from perf_tracker.input_controller import InputController
 from perf_tracker.visualizer import Visualizer
@@ -26,8 +27,23 @@ def main() -> int:
     #                             ["small", "middle", "bigger than middle"],
     #                             Path("perf_output/dev_test"))
 
-    controller = InputController.handle_inputs()
-    controller.run_tests()
+    # x_vals = [[10, 40, 1000] for i in range(3)]
+    # values = [[1, 4, 20], [5, 20, 50], [10, 100, 500], [60, 300, 400]]
+    # labels = ["a", "b", "c", "d"]
+    values = [[1, 4, 20], [5, 20, 50], [10, 100, 500], [60, 300, 400],
+              [60, 300, 400]]
+    labels = ["a", "b", "c", "d", "e"]
+    part_labels = ["p1", "p2", "p3"]
+
+    Visualizer.create_bar_graph(values, part_labels, labels)
+
+    # std_devs = [[3, 3, 3], [4, 4, 4], [5, 5, 5]]
+
+    # Visualizer.create_line_chart(x_vals, values, std_devs,
+    #                              ["plt1", "plt2", "plt3"], Path("."))
+
+    # controller = InputController.handle_inputs()
+    # controller.run_tests()
 
     # for prog in progs:
     #     print(prog.name)

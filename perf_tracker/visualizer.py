@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
 import matplotlib.pyplot as plt
+from numpy import partition
 
 
 class Visualizer():
@@ -56,3 +57,21 @@ class Visualizer():
 
         out = out_dir / f"{plot_name}.png"
         plt.savefig(out, dpi=300, bbox_inches="tight")
+
+    @staticmethod
+    def create_bar_graph(values: list[list[int]], partitions_labels: list[str],
+                         bar_labels: list[str]):
+
+        bar_width = 1 / (len(values) + 1)
+        x = [i for i in range(len(partitions_labels))]
+
+        for i, value in enumerate(values):
+            x_vals = [j + (i * bar_width) for j in x]
+            plt.bar(x_vals, value, label=bar_labels[i], width=bar_width)
+
+        plt.xlabel("Partitions")
+        plt.ylabel("Runtime")
+        plt.xticks([i + 0.5 - bar_width for i in x], partitions_labels)
+        plt.legend()
+
+        plt.show()
