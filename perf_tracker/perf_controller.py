@@ -2,6 +2,8 @@ from perf_tracker.prog import Prog
 
 from pathlib import Path
 
+from perf_tracker.visualizer import Visualizer
+
 
 class PerfController():
     """The controller to run the performance tests"""
@@ -30,3 +32,21 @@ class PerfController():
     def run_tests(self):
         for prog in self.progs:
             prog.run_all_tests(self.iterations)
+        self.comparison_graph()
+
+    def comparison_graph(self):
+        x_vals = []
+        values = []
+        std_devs = []
+        labels = []
+
+        for prog in self.progs:
+            labels.append(prog.name)
+            values.append(
+                [tn.get_avg_time() for tn in prog.time_node.children])
+            std_devs.append(
+                [tn.get_sd_time() for tn in prog.time_node.children])
+            x_vals.append(prog.x)
+
+        Visualizer.create_line_chart(x_vals, values, std_devs, labels,
+                                     self.out_dir)
