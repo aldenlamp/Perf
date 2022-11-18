@@ -142,8 +142,6 @@ class Prog():
 
         std_err_out = cache_process.stderr.decode("utf-8")
 
-        pid = std_err_out.split("==")[1]
-
         with open(val_out_dir / "callgrind.txt", "w+") as leak_file:
 
             leak_file.write(f"Return Code: {cache_process.returncode}")
@@ -158,6 +156,7 @@ class Prog():
             print(f"Failed to run valgrind")
             return
 
+        pid = std_err_out.split("==")[1]
         Path(f"callgrind.out.{pid}").rename(
             str(val_out_dir / f"callgrind.out.{pid}"))
 
