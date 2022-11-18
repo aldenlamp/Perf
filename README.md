@@ -11,6 +11,14 @@ The timer objects are designed in a tree structure (to time different subroutine
 
 The program object runs a program and tracks its main timer.
 
+## Installation
+
+The current way to install is to clone and run setup.py
+
+    git clone https://github.com/aldenlamp/Perf.git
+    cd Perf
+    python setup.py install
+
 
 ## Usage
 
@@ -37,3 +45,4 @@ Everything gets outputted to the output folder under the name.
 For example, all the data will be written to `./output_folder/name/`
 
 Within this folder, there are subfolders for every program being tested, and one for the comparisons. 
+
