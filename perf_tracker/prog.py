@@ -129,16 +129,16 @@ class Prog():
         val_out_dir = self.out_dir / "valgrind"
         val_out_dir.mkdir()
 
-        ex_prog = self.prog
+        prog = self.prog
         if "$" in self.prog and self.args:
-            ex_prog = self.prog.replace("$", self.args[0])
+            prog = self.prog.replace("$", self.args[0])
 
-        cache_prog = f"valgrind --tool=callgrind --simulate-cache=yes {ex_prog}"
+        cache_prog = f"valgrind --tool=callgrind --simulate-cache=yes {prog}"
         print(f"RUNNING (val - callgrind): {cache_prog}")
-        
+
         cache_process = subprocess.run(cache_prog,
-                                     shell=True,
-                                     capture_output=True)
+                                       shell=True,
+                                       capture_output=True)
 
         std_err_out = cache_process.stderr.decode("utf-8")
 
@@ -153,16 +153,19 @@ class Prog():
 
             leak_file.write("\n\n======STDOUT======\n")
             leak_file.write(cache_process.stdout.decode("utf-8"))
-        
+
         if cache_process.returncode != 0:
             print(f"Failed to run valgrind")
             return
 
+        Path(f"callgrind.out.{pid}").rename(
+            str(val_out_dir / f"callgrind.out.{pid}"))
 
-        Path(f"callgrind.out.{pid}").rename(str(val_out_dir / f"callgrind.out.{pid}"))
+        annotate_prog = (f"callgrind_annotate "
+                         f"{str(val_out_dir)}/callgrind.out.{pid} > "
+                         f"{str(val_out_dir)}/callgrind.annotated.{pid}")
 
-        annotate_prog = f"callgrind_annotate {str(val_out_dir)}/callgrind.out.{pid} > {str(val_out_dir)}/callgrind.annotated.{pid}"
         print(f"RUNNING (val - annotate): {annotate_prog}")
         cache_process = subprocess.run(annotate_prog,
-                                shell=True,
-                                capture_output=True)
+                                       shell=True,
+                                       capture_output=True)
