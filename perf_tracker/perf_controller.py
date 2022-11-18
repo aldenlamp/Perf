@@ -31,6 +31,9 @@ class PerfController():
 
     def run_tests(self):
         for prog in self.progs:
+            prog.run_commands()
+            if self.valgrind:
+                prog.run_valgrind()
             prog.run_all_tests(self.iterations)
         self.comparison_graph()
 

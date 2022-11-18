@@ -49,7 +49,6 @@ class Prog():
 
     def run_all_tests(self, iterations: int):
         """Runs all the iterations for all the arguments"""
-        self.run_commands()
         for arg in self.args:
             (self.out_dir / "iterations" / f"arg_{arg}").mkdir(parents=True)
             for i in range(iterations):
@@ -130,24 +129,42 @@ class Prog():
         val_out_dir = self.out_dir / "valgrind"
         val_out_dir.mkdir()
 
-        ex_prog = self.prog
+        prog = self.prog
         if "$" in self.prog and self.args:
-            ex_prog = self.prog.replace("$", self.args[0])
+            prog = self.prog.replace("$", self.args[0])
 
-        # TODO (Alden): Run CacheGrind as well
-        val_process = subprocess.run(f"valgrind {ex_prog}",
-                                     shell=True,
-                                     capture_output=True)
+        cache_prog = f"valgrind --tool=callgrind --simulate-cache=yes {prog}"
+        print(f"RUNNING (val - callgrind): {cache_prog}")
 
-        if val_process.returncode != 0:
-            print("Could not run valgrind")
+        cache_process = subprocess.run(cache_prog,
+                                       shell=True,
+                                       capture_output=True)
+
+        std_err_out = cache_process.stderr.decode("utf-8")
+
+        with open(val_out_dir / "callgrind.txt", "w+") as leak_file:
+
+            leak_file.write(f"Return Code: {cache_process.returncode}")
+
+            leak_file.write("\n\n======STDERR======\n")
+            leak_file.write(std_err_out)
+
+            leak_file.write("\n\n======STDOUT======\n")
+            leak_file.write(cache_process.stdout.decode("utf-8"))
+
+        if cache_process.returncode != 0:
+            print(f"Failed to run valgrind")
             return
 
-        # TODO (Alden): Correctly output valgrinds output
+        pid = std_err_out.split("==")[1]
+        Path(f"callgrind.out.{pid}").rename(
+            str(val_out_dir / f"callgrind.out.{pid}"))
 
-        # print("=========OUTPUT=========")
-        # output = val_process.stdout.decode("utf-8")
-        # print(output)
-        # print("=========ERR=========")
-        # error = val_process.stdout.decode("utf-8")
-        # print(error)
+        annotate_prog = (f"callgrind_annotate "
+                         f"{str(val_out_dir)}/callgrind.out.{pid} > "
+                         f"{str(val_out_dir)}/callgrind.annotated.{pid}")
+
+        print(f"RUNNING (val - annotate): {annotate_prog}")
+        cache_process = subprocess.run(annotate_prog,
+                                       shell=True,
+                                       capture_output=True)
