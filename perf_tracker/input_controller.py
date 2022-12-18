@@ -31,7 +31,8 @@ class InputController():
         out_dir_arg = out_dir / args.name
 
         out_dir.mkdir(exist_ok=True)
-        InputController._generate_output_folder(out_dir_arg)
+        InputController._generate_output_folder(out_dir_arg,
+                                                override=args.override)
 
         # Get programs
         prog_list = InputController._input_prog(args.prog, args.file,
@@ -59,12 +60,15 @@ class InputController():
         return PerfController(**controller_args)
 
     @staticmethod
-    def _generate_output_folder(out_dir: Path):
+    def _generate_output_folder(out_dir: Path, override: bool):
         """Safely generate output directory"""
         if out_dir.exists():
             while True:
-                response = input((f"{out_dir} already exists. "
-                                  "Would you like to override it? [y/n]: "))
+                response = "y"
+                if not override:
+                    response = input(
+                        (f"{out_dir} already exists. "
+                         "Would you like to override it? [y/n]: "))
 
                 if response == "n" or response == "N":
                     sys.exit(1)
@@ -235,3 +239,9 @@ class InputController():
                             type=str,
                             required=False,
                             help="A single program to perf test")
+
+        parser.add_argument("-y",
+                            "--yes",
+                            dest="override",
+                            action="store_true",
+                            help="Override existing folder if needed")
